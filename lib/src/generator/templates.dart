@@ -66,17 +66,33 @@ ${locales.map((locale) => _generateLocale(locale)).join("\n")}
   bool shouldReload(AppLocalizationDelegate old) => false;
 
   bool _isSupported(Locale locale) {
-    ${nnbd ? '' : 'if (locale == null) return false;'}
+${_isSupportedImpl(nnbd)}
+  }
+}
+"""
+      .trim();
+}
+
+String _isSupportedImpl(bool nnbd) {
+  if (nnbd) {
+    return '''
     for (var supportedLocale in supportedLocales) {
       if (supportedLocale.languageCode == locale.languageCode) {
         return true;
       }
     }
-    return false;
+    return false;''';
+  } else {
+    return '''
+    if (locale != null) {
+      for (var supportedLocale in supportedLocales) {
+        if (supportedLocale.languageCode == locale.languageCode) {
+          return true;
+        }
+      }
+    }
+    return false;''';
   }
-}
-"""
-      .trim();
 }
 
 String _generateLocale(String locale) {
